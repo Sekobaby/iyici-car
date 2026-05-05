@@ -48,30 +48,39 @@ const Users = () => {
       alert("Şifre en az 6 karakter olmalıdır!");
       return;
     }
+
     setSaving(true);
     try {
-      // ESKİ RPC KODUNU SİLİP YERİNE BUNU YAZIYORUZ:
-      const { data, error } = await supabase.auth.signUp({
-        email: newUser.email,
-        password: newUser.password,
-        options: {
-          // Bu datalar veritabanındaki tetikleyiciye (trigger) gider
-          data: {
+      // Edge Function'ı çağır
+      const response = await fetch(
+        `https://lrswtkjfscpqipkwimwo.supabase.co/functions/v1/create-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            email: newUser.email,
+            password: newUser.password,
             full_name: newUser.full_name || newUser.email,
             role: newUser.role,
-          },
+          }),
         },
-      });
+      );
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Bilinmeyen hata");
+      }
 
       alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
       setShowForm(false);
-
-      // Tetikleyicinin tabloya yazması için 1 saniye bekleyip listeyi yenile
       setTimeout(() => fetchUsers(), 1000);
     } catch (err) {
+      console.error("Hata:", err);
       alert("Hata: " + err.message);
     }
     setSaving(false);
