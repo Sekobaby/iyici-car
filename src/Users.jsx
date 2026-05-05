@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { supabase, supabaseAdmin } from "./supabaseClient";
+import { supabase } from "./supabaseClient";
 //import { supabase } from "./supabaseClient";
 import {
   Trash2,
@@ -42,13 +42,13 @@ const Users = () => {
   const handleCreateUser = async () => {
     setSaving(true);
     try {
+      // Edge Function'ı çağır (backend'de Service Role Key kullanılır)
       const response = await fetch(
-        "https://lrswtkjfscpqipkwimwo.supabase.co/functions/v1/create-user",
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            // Anon Key'i kullan (safe)
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
