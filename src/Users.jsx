@@ -40,33 +40,36 @@ const Users = () => {
   }, []);
 
   const handleCreateUser = async () => {
+    if (!newUser.email || !newUser.password) {
+      alert("E-posta ve şifre zorunludur!");
+      return;
+    }
+    if (newUser.password.length < 6) {
+      alert("Şifre en az 6 karakter olmalıdır!");
+      return;
+    }
     setSaving(true);
     try {
-      // Edge Function'ı çağır (backend'de Service Role Key kullanılır)
-      const response = await fetch(
-        `https://lrswtkjfscpqipkwimwo.supabase.co/functions/v1/create-user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({
-            email: newUser.email,
-            password: newUser.password,
-            full_name: newUser.full_name,
+      // ESKİ RPC KODUNU SİLİP YERİNE BUNU YAZIYORUZ:
+      const { data, error } = await supabase.auth.signUp({
+        email: newUser.email,
+        password: newUser.password,
+        options: {
+          // Bu datalar veritabanındaki tetikleyiciye (trigger) gider
+          data: {
+            full_name: newUser.full_name || newUser.email,
             role: newUser.role,
-          }),
+          },
         },
-      );
+      });
 
-      const result = await response.json();
+      if (error) throw error;
 
-      if (!response.ok) throw new Error(result.error);
-
-      alert("Kullanıcı başarıyla oluşturuldu!");
+      alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
       setShowForm(false);
+
+      // Tetikleyicinin tabloya yazması için 1 saniye bekleyip listeyi yenile
       setTimeout(() => fetchUsers(), 1000);
     } catch (err) {
       alert("Hata: " + err.message);
