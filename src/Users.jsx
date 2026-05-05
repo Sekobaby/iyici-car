@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { supabase, supabaseAdmin } from "./supabaseClient";
 import { supabase } from "./supabaseClient";
 import {
   Trash2,
@@ -39,22 +40,29 @@ const Users = () => {
   }, []);
 
   const handleCreateUser = async () => {
-    // ... (validasyonlar aynı kalabilir)
     setSaving(true);
     try {
-      // RPC YERİNE STANDART SIGNUP KULLANIYORUZ
-      const { data, error } = await supabase.auth.signUp({
+      // 1. Admin client ile user oluştur
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
         email: newUser.email,
         password: newUser.password,
-        options: {
-          data: {
-            full_name: newUser.full_name || newUser.email,
-            role: newUser.role,
-          },
-        },
+        email_confirm: true, // Email onay gerekmiyor
       });
 
       if (error) throw error;
+
+      // 2. Profile tablosuna ekle
+      const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .insert([
+          {
+            id: data.user.id,
+            full_name: newUser.full_name || newUser.email,
+            role: newUser.role,
+          },
+        ]);
+
+      if (profileError) throw profileError;
 
       alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
