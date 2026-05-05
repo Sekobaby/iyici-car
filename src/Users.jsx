@@ -44,7 +44,7 @@ const Users = () => {
     try {
       // Edge Function'ı çağır (backend'de Service Role Key kullanılır)
       const response = await fetch(
-        `https://iyici-car.netlify.app/functions/v1/create-user`,
+        `https://lrswtkjfscpqipkwimwo.supabase.co/functions/v1/create-user`,
         {
           method: "POST",
           headers: {
