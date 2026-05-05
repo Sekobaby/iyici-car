@@ -44,7 +44,7 @@ const Users = () => {
     try {
       // Edge Function'ı çağır (backend'de Service Role Key kullanılır)
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`,
+        `https://iyici-car.netlify.app/functions/v1/create-user`,
         {
           method: "POST",
           headers: {
