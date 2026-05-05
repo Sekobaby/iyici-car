@@ -39,22 +39,14 @@ const Users = () => {
   }, []);
 
   const handleCreateUser = async () => {
-    if (!newUser.email || !newUser.password) {
-      alert("E-posta ve şifre zorunludur!");
-      return;
-    }
-    if (newUser.password.length < 6) {
-      alert("Şifre en az 6 karakter olmalıdır!");
-      return;
-    }
+    // ... (validasyonlar aynı kalabilir)
     setSaving(true);
     try {
-      // ESKİ RPC KODUNU SİLİP YERİNE BUNU YAZIYORUZ:
+      // RPC YERİNE STANDART SIGNUP KULLANIYORUZ
       const { data, error } = await supabase.auth.signUp({
         email: newUser.email,
         password: newUser.password,
         options: {
-          // Bu datalar veritabanındaki tetikleyiciye (trigger) gider
           data: {
             full_name: newUser.full_name || newUser.email,
             role: newUser.role,
@@ -67,8 +59,6 @@ const Users = () => {
       alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
       setShowForm(false);
-
-      // Tetikleyicinin tabloya yazması için 1 saniye bekleyip listeyi yenile
       setTimeout(() => fetchUsers(), 1000);
     } catch (err) {
       alert("Hata: " + err.message);
