@@ -49,26 +49,14 @@ const Users = () => {
     }
     setSaving(true);
     try {
-      // Kullanıcı oluştur
-      const { data, error } = await supabase.auth.signUp({
-        email: newUser.email,
-        password: newUser.password,
-        options: {
-          data: { full_name: newUser.full_name, role: newUser.role },
-        },
+      const { data, error } = await supabase.rpc("create_user", {
+        user_email: newUser.email,
+        user_password: newUser.password,
+        user_name: newUser.full_name || newUser.email,
+        user_role: newUser.role,
       });
       if (error) throw error;
-
-      // Profile tablosunu güncelle (trigger zaten oluşturuyor ama role için)
-      if (data.user) {
-        await supabase.from("profiles").upsert({
-          id: data.user.id,
-          full_name: newUser.full_name,
-          role: newUser.role,
-        });
-      }
-
-      alert(`Kullanıcı oluşturuldu: ${newUser.email}`);
+      alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
       setShowForm(false);
       fetchUsers();
