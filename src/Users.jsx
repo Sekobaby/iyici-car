@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase, supabaseAdmin } from "./supabaseClient";
-import { supabase } from "./supabaseClient";
+//import { supabase } from "./supabaseClient";
 import {
   Trash2,
   UserPlus,
