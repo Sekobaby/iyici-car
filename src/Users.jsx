@@ -42,29 +42,29 @@ const Users = () => {
   const handleCreateUser = async () => {
     setSaving(true);
     try {
-      // 1. Admin client ile user oluştur
-      const { data, error } = await supabaseAdmin.auth.admin.createUser({
-        email: newUser.email,
-        password: newUser.password,
-        email_confirm: true, // Email onay gerekmiyor
-      });
-
-      if (error) throw error;
-
-      // 2. Profile tablosuna ekle
-      const { error: profileError } = await supabaseAdmin
-        .from("profiles")
-        .insert([
-          {
-            id: data.user.id,
-            full_name: newUser.full_name || newUser.email,
-            role: newUser.role,
+      const response = await fetch(
+        "https://lrswtkjfscpqipkwimwo.supabase.co/functions/v1/create-user",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            // Anon Key'i kullan (safe)
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
-        ]);
+          body: JSON.stringify({
+            email: newUser.email,
+            password: newUser.password,
+            full_name: newUser.full_name,
+            role: newUser.role,
+          }),
+        },
+      );
 
-      if (profileError) throw profileError;
+      const result = await response.json();
 
-      alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
+      if (!response.ok) throw new Error(result.error);
+
+      alert("Kullanıcı başarıyla oluşturuldu!");
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
       setShowForm(false);
       setTimeout(() => fetchUsers(), 1000);
