@@ -49,17 +49,27 @@ const Users = () => {
     }
     setSaving(true);
     try {
-      const { data, error } = await supabase.rpc("create_user", {
-        user_email: newUser.email,
-        user_password: newUser.password,
-        user_name: newUser.full_name || newUser.email,
-        user_role: newUser.role,
+      // ESKİ RPC KODUNU SİLİP YERİNE BUNU YAZIYORUZ:
+      const { data, error } = await supabase.auth.signUp({
+        email: newUser.email,
+        password: newUser.password,
+        options: {
+          // Bu datalar veritabanındaki tetikleyiciye (trigger) gider
+          data: {
+            full_name: newUser.full_name || newUser.email,
+            role: newUser.role,
+          },
+        },
       });
+
       if (error) throw error;
+
       alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
       setShowForm(false);
-      fetchUsers();
+
+      // Tetikleyicinin tabloya yazması için 1 saniye bekleyip listeyi yenile
+      setTimeout(() => fetchUsers(), 1000);
     } catch (err) {
       alert("Hata: " + err.message);
     }
