@@ -467,16 +467,27 @@ const Inventory = ({ mode }) => {
               <div className="relative flex-1 flex items-center justify-center min-h-[250px]">
                 <img
                   src={selectedItem.image_urls?.[activeImageIndex]}
-                  className="max-h-[45vh] max-w-full object-contain rounded-2xl"
+                  onClick={() => {
+                    const w = window.open();
+                    w.document.write(
+                      `<img src="${selectedItem.image_urls?.[activeImageIndex]}" style="width:100%;height:100%;object-fit:contain;background:#000;margin:0;padding:0;">`,
+                    );
+                  }}
+                  className="max-h-[45vh] max-w-full object-contain rounded-2xl cursor-pointer hover:scale-105 transition-all"
                   alt=""
                 />
                 {selectedItem.image_urls?.length > 1 && (
                   <>
                     <button
                       onClick={() => {
-                        const n = Math.max(0, activeImageIndex - 1);
+                        const n =
+                          activeImageIndex === 0
+                            ? selectedItem.image_urls.length - 1
+                            : activeImageIndex - 1;
                         setActiveImageIndex(n);
                         if (n < thumbStart) setThumbStart(n);
+                        if (n >= thumbStart + THUMB_VISIBLE)
+                          setThumbStart(n - THUMB_VISIBLE + 1);
                       }}
                       className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-black"
                     >
@@ -484,13 +495,15 @@ const Inventory = ({ mode }) => {
                     </button>
                     <button
                       onClick={() => {
-                        const n = Math.min(
-                          selectedItem.image_urls.length - 1,
-                          activeImageIndex + 1,
-                        );
+                        const n =
+                          activeImageIndex ===
+                          selectedItem.image_urls.length - 1
+                            ? 0
+                            : activeImageIndex + 1;
                         setActiveImageIndex(n);
                         if (n >= thumbStart + THUMB_VISIBLE)
                           setThumbStart(n - THUMB_VISIBLE + 1);
+                        if (n < thumbStart) setThumbStart(0);
                       }}
                       className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-black"
                     >
