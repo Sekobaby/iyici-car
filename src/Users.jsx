@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
-//import { supabase } from "./supabaseClient";
 import {
   Trash2,
   UserPlus,
   RefreshCw,
   Shield,
   User,
-  Mail,
   Eye,
   EyeOff,
 } from "lucide-react";
@@ -18,6 +16,7 @@ const Users = () => {
   const [showForm, setShowForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [newUser, setNewUser] = useState({
     email: "",
     password: "",
@@ -40,25 +39,26 @@ const Users = () => {
   }, []);
 
   const handleCreateUser = async () => {
+    setError("");
+
     if (!newUser.email || !newUser.password) {
-      alert("E-posta ve şifre zorunludur!");
+      setError("E-posta ve şifre zorunludur!");
       return;
     }
     if (newUser.password.length < 6) {
-      alert("Şifre en az 6 karakter olmalıdır!");
+      setError("Şifre en az 6 karakter olmalıdır!");
       return;
     }
 
     setSaving(true);
     try {
-      // Edge Function'ı çağır
+      // ⭐ NETLIFY FUNCTION ÇAĞRISI
       const response = await fetch(
-        `https://lrswtkjfscpqipkwimwo.supabase.co/functions/v1/create-user`,
+        "http://localhost:8888/.netlify/functions/create-user",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({
             email: newUser.email,
@@ -75,13 +75,14 @@ const Users = () => {
         throw new Error(result.error || "Bilinmeyen hata");
       }
 
-      alert(`Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
+      setError("");
+      alert(`✅ Kullanıcı başarıyla oluşturuldu: ${newUser.email}`);
       setNewUser({ email: "", password: "", full_name: "", role: "user" });
       setShowForm(false);
-      setTimeout(() => fetchUsers(), 1000);
+      setTimeout(() => fetchUsers(), 500);
     } catch (err) {
       console.error("Hata:", err);
-      alert("Hata: " + err.message);
+      setError(`❌ Hata: ${err.message}`);
     }
     setSaving(false);
   };
@@ -89,13 +90,13 @@ const Users = () => {
   const handleDeleteUser = async (userId, email) => {
     if (!window.confirm(`${email} kullanıcısını silmek istediğine emin misin?`))
       return;
-    // Profiles tablosundan sil (auth.users cascade ile silinmez frontend'den)
+
     const { error } = await supabase.from("profiles").delete().eq("id", userId);
     if (!error) {
-      alert("Profil silindi. Auth kaydı için Supabase Dashboard kullanın.");
+      alert("✅ Profil silindi.");
       fetchUsers();
     } else {
-      alert("Hata: " + error.message);
+      alert("❌ Hata: " + error.message);
     }
   };
 
@@ -105,7 +106,11 @@ const Users = () => {
       .from("profiles")
       .update({ role: newRole })
       .eq("id", userId);
-    if (!error) fetchUsers();
+    if (!error) {
+      fetchUsers();
+    } else {
+      alert("❌ Rol değiştirme hatası: " + error.message);
+    }
   };
 
   const inputClass =
@@ -114,7 +119,7 @@ const Users = () => {
     "text-[10px] font-black text-zinc-500 uppercase mb-1.5 block tracking-widest";
 
   return (
-    <div className="w-full text-white font-sans">
+    <div className="w-full text-white font-sans p-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-black italic uppercase tracking-tighter">
           KULLANICILAR
@@ -144,12 +149,22 @@ const Users = () => {
                 Yeni <span className="text-red-600">Kullanıcı</span>
               </h3>
               <button
-                onClick={() => setShowForm(false)}
+                onClick={() => {
+                  setShowForm(false);
+                  setError("");
+                }}
                 className="text-zinc-500 hover:text-white text-2xl"
               >
                 &times;
               </button>
             </div>
+
+            {error && (
+              <div className="px-8 py-3 bg-red-900/20 border-b border-red-600/30">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
             <div className="px-8 pb-4 space-y-4">
               <div>
                 <label className={labelClass}>Ad Soyad</label>
@@ -160,6 +175,7 @@ const Users = () => {
                   onChange={(e) =>
                     setNewUser({ ...newUser, full_name: e.target.value })
                   }
+                  placeholder="Örnek: Ahmet Yılmaz"
                 />
               </div>
               <div>
@@ -171,6 +187,7 @@ const Users = () => {
                   onChange={(e) =>
                     setNewUser({ ...newUser, email: e.target.value })
                   }
+                  placeholder="ornek@gmail.com"
                 />
               </div>
               <div>
@@ -183,8 +200,10 @@ const Users = () => {
                     onChange={(e) =>
                       setNewUser({ ...newUser, password: e.target.value })
                     }
+                    placeholder="••••••"
                   />
                   <button
+                    type="button"
                     onClick={() => setShowPassword((s) => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
                   >
@@ -208,8 +227,11 @@ const Users = () => {
             </div>
             <div className="p-8 pt-4 flex gap-3">
               <button
-                onClick={() => setShowForm(false)}
-                className="flex-1 bg-zinc-900 border border-zinc-800 text-zinc-500 py-3.5 rounded-2xl font-black uppercase text-[10px] tracking-widest"
+                onClick={() => {
+                  setShowForm(false);
+                  setError("");
+                }}
+                className="flex-1 bg-zinc-900 border border-zinc-800 text-zinc-500 py-3.5 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-zinc-800 transition-all"
               >
                 İptal
               </button>
@@ -264,7 +286,7 @@ const Users = () => {
                     {user.full_name || "—"}
                   </p>
                   <p className="text-[10px] text-zinc-500 font-bold mt-0.5">
-                    {new Date(user.created_at).toLocaleDateString("tr-TR")}
+                    {user.email || "—"}
                   </p>
                 </div>
 
@@ -286,7 +308,10 @@ const Users = () => {
 
                 <button
                   onClick={() =>
-                    handleDeleteUser(user.id, user.full_name || user.id)
+                    handleDeleteUser(
+                      user.id,
+                      user.full_name || user.email || user.id,
+                    )
                   }
                   className="w-9 h-9 flex items-center justify-center bg-zinc-800/50 border border-zinc-700/50 rounded-xl text-zinc-500 hover:text-red-500 hover:border-red-900/50 transition-all"
                 >
@@ -304,8 +329,6 @@ const Users = () => {
         </p>
         <p className="text-xs text-zinc-400">
           Rol badge'ine tıklayarak kullanıcı/admin arasında geçiş yapabilirsin.
-          Kullanıcı silmek için Supabase Dashboard → Authentication → Users
-          kullan.
         </p>
       </div>
     </div>
