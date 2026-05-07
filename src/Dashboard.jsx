@@ -28,6 +28,8 @@ const emptyForm = {
   transmission: "",
   seat_count: "",
   steering_side: "",
+  price: "",
+  currency: "TRY",
 };
 
 const Dashboard = ({ profile }) => {
@@ -359,6 +361,38 @@ const Dashboard = ({ profile }) => {
                           <option value="">Seçiniz</option>
                           <option>Sol (LHD)</option>
                           <option>Sağ (RHD)</option>
+                        </select>
+                      </Field>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-red-600 text-[10px] font-black uppercase tracking-widest border-b border-zinc-800 pb-2 mb-4">
+                      3. Fiyat Bilgisi
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Field label="Fiyat">
+                        <input
+                          type="number"
+                          step="0.01"
+                          className={inputClass}
+                          value={formData.price}
+                          onChange={(e) =>
+                            set(
+                              "price",
+                              e.target.value ? parseFloat(e.target.value) : "",
+                            )
+                          }
+                        />
+                      </Field>
+                      <Field label="Para Birimi">
+                        <select
+                          className={selectClass}
+                          value={formData.currency || "TRY"}
+                          onChange={(e) => set("currency", e.target.value)}
+                        >
+                          <option value="TRY">₺ Türk Lirası (TRY)</option>
+                          <option value="USD">$ Amerikan Doları (USD)</option>
+                          <option value="GBP">£ İngiliz Sterlini (GBP)</option>
                         </select>
                       </Field>
                     </div>

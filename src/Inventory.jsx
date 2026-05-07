@@ -342,6 +342,19 @@ const Inventory = ({ mode }) => {
                           <span>{item.transmission}</span>
                         </>
                       )}
+                      {item.price && (
+                        <>
+                          <span className="text-zinc-700">•</span>
+                          <span className="text-green-500">
+                            {item.price.toLocaleString("tr-TR", {
+                              minimumFractionDigits: 2,
+                            })}
+                            {item.currency === "TRY" && " ₺"}
+                            {item.currency === "USD" && " $"}
+                            {item.currency === "GBP" && " £"}
+                          </span>
+                        </>
+                      )}
                     </div>
                     <div className="flex gap-2 mb-2 mt-auto">
                       <button
@@ -559,6 +572,12 @@ const Inventory = ({ mode }) => {
                   { label: "KOLTUK", value: selectedItem.seat_count },
                   { label: "DİREKSİYON", value: selectedItem.steering_side },
                   { label: "SEGMENT", value: selectedItem.segment },
+                  {
+                    label: "FİYAT",
+                    value: selectedItem.price
+                      ? `${selectedItem.price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })} ${selectedItem.currency === "TRY" ? "₺" : selectedItem.currency === "USD" ? "$" : "£"}`
+                      : "---",
+                  },
                 ].map((d, i) => (
                   <div
                     key={i}
