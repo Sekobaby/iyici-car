@@ -54,7 +54,7 @@ const Users = () => {
     try {
       // ⭐ NETLIFY FUNCTION ÇAĞRISI
       const response = await fetch(
-        "http://localhost:8888/.netlify/functions/create-user",
+        "https://iyici-car.netlify.app/.netlify/functions/create-user",
         {
           method: "POST",
           headers: {
