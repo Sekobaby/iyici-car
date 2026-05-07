@@ -144,6 +144,31 @@ const Inventory = ({ mode }) => {
       alert("Hata: " + err.message);
     }
   };
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const handleKeyPress = (e) => {
+      if (e.key === "ArrowLeft") {
+        const n =
+          activeImageIndex === 0
+            ? selectedItem.image_urls.length - 1
+            : activeImageIndex - 1;
+        setActiveImageIndex(n);
+      } else if (e.key === "ArrowRight") {
+        const n =
+          activeImageIndex === selectedItem.image_urls.length - 1
+            ? 0
+            : activeImageIndex + 1;
+        setActiveImageIndex(n);
+      } else if (e.key === "Escape") {
+        setLightboxOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [lightboxOpen, activeImageIndex, selectedItem]);
 
   const closeModal = () => {
     setSelectedItem(null);
@@ -637,6 +662,7 @@ const Inventory = ({ mode }) => {
         </div>
       )}
       {/* LIGHTBOX MODAL */}
+
       {lightboxOpen && (
         <div className="fixed inset-0 z-[3000] bg-black/98 flex items-center justify-center backdrop-blur-xl">
           <button
