@@ -27,6 +27,7 @@ const Inventory = ({ mode }) => {
   const [filterTransmission, setFilterTransmission] = useState("");
   const [userProfile, setUserProfile] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // --- SAYFALAMA STATE'LERİ ---
   const [currentPage, setCurrentPage] = useState(1);
@@ -467,12 +468,7 @@ const Inventory = ({ mode }) => {
               <div className="relative flex-1 flex items-center justify-center min-h-[250px]">
                 <img
                   src={selectedItem.image_urls?.[activeImageIndex]}
-                  onClick={() => {
-                    const w = window.open();
-                    w.document.write(
-                      `<img src="${selectedItem.image_urls?.[activeImageIndex]}" style="width:100%;height:100%;object-fit:contain;background:#000;margin:0;padding:0;">`,
-                    );
-                  }}
+                  onClick={() => setLightboxOpen(true)}
                   className="max-h-[45vh] max-w-full object-contain rounded-2xl cursor-pointer hover:scale-105 transition-all"
                   alt=""
                 />
@@ -637,6 +633,53 @@ const Inventory = ({ mode }) => {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+      {/* LIGHTBOX MODAL */}
+      {lightboxOpen && (
+        <div className="fixed inset-0 z-[3000] bg-black/98 flex items-center justify-center backdrop-blur-xl">
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-6 right-6 text-white text-3xl hover:scale-110 transition-all z-50"
+          >
+            ✕
+          </button>
+
+          <button
+            onClick={() => {
+              const n =
+                activeImageIndex === 0
+                  ? selectedItem.image_urls.length - 1
+                  : activeImageIndex - 1;
+              setActiveImageIndex(n);
+            }}
+            className="absolute left-6 text-white text-4xl hover:scale-110 transition-all z-50"
+          >
+            ‹
+          </button>
+
+          <img
+            src={selectedItem.image_urls?.[activeImageIndex]}
+            className="max-h-[90vh] max-w-[90vw] object-contain"
+            alt=""
+          />
+
+          <button
+            onClick={() => {
+              const n =
+                activeImageIndex === selectedItem.image_urls.length - 1
+                  ? 0
+                  : activeImageIndex + 1;
+              setActiveImageIndex(n);
+            }}
+            className="absolute right-6 text-white text-4xl hover:scale-110 transition-all z-50"
+          >
+            ›
+          </button>
+
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-xl text-sm font-black">
+            {activeImageIndex + 1} / {selectedItem.image_urls.length}
           </div>
         </div>
       )}
