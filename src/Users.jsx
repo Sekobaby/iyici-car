@@ -8,6 +8,7 @@ import {
   User,
   Eye,
   EyeOff,
+  CheckCircle,
 } from "lucide-react";
 
 const Users = () => {
@@ -52,7 +53,6 @@ const Users = () => {
 
     setSaving(true);
     try {
-      // ⭐ NETLIFY FUNCTION ÇAĞRISI
       const response = await fetch(
         "https://iyici-car.netlify.app/.netlify/functions/create-user",
         {
@@ -110,6 +110,24 @@ const Users = () => {
       fetchUsers();
     } else {
       alert("❌ Rol değiştirme hatası: " + error.message);
+    }
+  };
+
+  const handleVerifyUser = async (userId, email) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ email_verified: true })
+        .eq("id", userId);
+
+      if (!error) {
+        alert(`✅ ${email} doğrulandı!`);
+        fetchUsers();
+      } else {
+        throw error;
+      }
+    } catch (err) {
+      alert("❌ Hata: " + err.message);
     }
   };
 
@@ -262,6 +280,8 @@ const Users = () => {
         <div className="flex flex-col gap-2">
           {users.map((user) => {
             const isAdmin = user.role === "admin";
+            const isVerified = user.email_verified;
+
             return (
               <div
                 key={user.id}
@@ -290,7 +310,7 @@ const Users = () => {
                   </p>
                 </div>
 
-                {/* ROL TOGGLE */}
+                {/* ROL BADGE */}
                 <button
                   onClick={() => handleToggleRole(user.id, user.role)}
                   className={`text-[9px] px-3 py-1.5 rounded-full font-black uppercase shrink-0 border transition-all ${
@@ -306,6 +326,24 @@ const Users = () => {
                   {new Date(user.created_at).toLocaleDateString("tr-TR")}
                 </span>
 
+                {/* VERIFY BUTONU - SADECE VERİFİED DEĞİLSE GÖSTER */}
+                {!isVerified && (
+                  <button
+                    onClick={() => handleVerifyUser(user.id, user.email)}
+                    className="text-[9px] px-3 py-1.5 rounded-full font-black uppercase shrink-0 border transition-all bg-green-600/20 text-green-500 border-green-600/30 hover:bg-green-600/30 flex items-center gap-1"
+                  >
+                    <CheckCircle size={11} /> VERIFY ET
+                  </button>
+                )}
+
+                {/* VERİFİED BADGE */}
+                {isVerified && (
+                  <div className="text-[9px] px-3 py-1.5 rounded-full font-black uppercase shrink-0 border bg-green-600/20 text-green-500 border-green-600/30 flex items-center gap-1">
+                    <CheckCircle size={11} /> VERİFİED
+                  </div>
+                )}
+
+                {/* SİL BUTONU */}
                 <button
                   onClick={() =>
                     handleDeleteUser(
@@ -316,24 +354,6 @@ const Users = () => {
                   className="w-9 h-9 flex items-center justify-center bg-zinc-800/50 border border-zinc-700/50 rounded-xl text-zinc-500 hover:text-red-500 hover:border-red-900/50 transition-all"
                 >
                   <Trash2 size={14} />
-                </button>
-                <button
-                  onClick={async () => {
-                    const { error } = await supabase
-                      .from("auth.users")
-                      .update({ email_confirmed_at: new Date().toISOString() })
-                      .eq("email", user.email);
-
-                    if (!error) {
-                      alert(`✅ ${user.email} verified oldu!`);
-                      fetchUsers(); // Listeyi yenile
-                    } else {
-                      alert("❌ Hata: " + error.message);
-                    }
-                  }}
-                  className="text-[9px] px-3 py-1.5 rounded-full font-black uppercase shrink-0 border transition-all bg-green-600/20 text-green-500 border-green-600/30 hover:bg-green-600/30"
-                >
-                  ✓ Verify Et
                 </button>
               </div>
             );
@@ -347,6 +367,7 @@ const Users = () => {
         </p>
         <p className="text-xs text-zinc-400">
           Rol badge'ine tıklayarak kullanıcı/admin arasında geçiş yapabilirsin.
+          Doğrulanmamış kullanıcıları "VERIFY ET" ile onaylayabilirsin.
         </p>
       </div>
     </div>
