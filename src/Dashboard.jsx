@@ -394,7 +394,7 @@ const Dashboard = ({ profile }) => {
                           onChange={(e) =>
                             set(
                               "price",
-                              e.target.value ? parseFloat(e.target.value) : ""
+                              e.target.value ? parseFloat(e.target.value) : "",
                             )
                           }
                         />
@@ -528,7 +528,7 @@ const Dashboard = ({ profile }) => {
                           onChange={(e) =>
                             set(
                               "price",
-                              e.target.value ? parseFloat(e.target.value) : ""
+                              e.target.value ? parseFloat(e.target.value) : "",
                             )
                           }
                         />
@@ -625,7 +625,7 @@ const Dashboard = ({ profile }) => {
                           onChange={(e) =>
                             set(
                               "price",
-                              e.target.value ? parseFloat(e.target.value) : ""
+                              e.target.value ? parseFloat(e.target.value) : "",
                             )
                           }
                         />
