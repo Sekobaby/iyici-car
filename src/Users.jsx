@@ -317,6 +317,24 @@ const Users = () => {
                 >
                   <Trash2 size={14} />
                 </button>
+                <button
+                  onClick={async () => {
+                    const { error } = await supabase
+                      .from("auth.users")
+                      .update({ email_confirmed_at: new Date().toISOString() })
+                      .eq("email", user.email);
+
+                    if (!error) {
+                      alert(`✅ ${user.email} verified oldu!`);
+                      fetchUsers(); // Listeyi yenile
+                    } else {
+                      alert("❌ Hata: " + error.message);
+                    }
+                  }}
+                  className="text-[9px] px-3 py-1.5 rounded-full font-black uppercase shrink-0 border transition-all bg-green-600/20 text-green-500 border-green-600/30 hover:bg-green-600/30"
+                >
+                  ✓ Verify Et
+                </button>
               </div>
             );
           })}
