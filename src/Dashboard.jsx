@@ -82,17 +82,35 @@ const Dashboard = ({ profile }) => {
       }
       const category_id =
         formType === "vehicle" ? 1 : formType === "engine" ? 2 : 3;
+
       const { error } = await supabase.from("products").insert([
         {
-          ...formData,
+          brand_model: formData.brand_model,
+          vin_no: formData.vin_no || null,
+          model_year:
+            formData.model_year && formData.model_year !== ""
+              ? parseInt(formData.model_year)
+              : null,
+          mileage:
+            formData.mileage && formData.mileage !== ""
+              ? parseInt(formData.mileage)
+              : null,
+          color: formData.color || null,
+          segment: formData.segment || null,
+          engine_code: formData.engine_code || null,
+          engine_capacity: formData.engine_capacity || null,
+          transmission: formData.transmission || null,
+          seat_count:
+            formData.seat_count && formData.seat_count !== ""
+              ? parseInt(formData.seat_count)
+              : null,
+          steering_side: formData.steering_side || null,
+          price:
+            formData.price && formData.price !== ""
+              ? parseFloat(formData.price)
+              : null,
+          currency: formData.currency || "TRY",
           image_urls: publicUrls,
-          model_year: formData.model_year
-            ? parseInt(formData.model_year)
-            : null,
-          mileage: formData.mileage ? parseInt(formData.mileage) : null,
-          seat_count: formData.seat_count
-            ? parseInt(formData.seat_count)
-            : null,
           category_id,
           is_active: true,
         },
@@ -138,7 +156,7 @@ const Dashboard = ({ profile }) => {
 
   return (
     <div className="w-full">
-      {/* HEADER - GÜNCELLENEN KISIM */}
+      {/* HEADER */}
       <header className="flex justify-between items-center mb-8">
         <div className="bg-zinc-900/50 border border-zinc-800 px-4 py-2 rounded-full flex items-center gap-3">
           <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
@@ -215,7 +233,7 @@ const Dashboard = ({ profile }) => {
                   onClick={() => setIsFormOpen(false)}
                   className="text-zinc-500 hover:text-white w-8 h-8 flex items-center justify-center text-2xl"
                 >
-                  &times;
+                  ×
                 </button>
               </div>
               <div className="flex gap-6 border-b border-zinc-800/50">
@@ -240,6 +258,7 @@ const Dashboard = ({ profile }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 md:p-8 pt-4 text-white">
+              {/* ARAÇ FORMU */}
               {formType === "vehicle" && (
                 <div className="space-y-6">
                   <div>
@@ -301,17 +320,13 @@ const Dashboard = ({ profile }) => {
                           onChange={(e) => set("segment", e.target.value)}
                         >
                           <option value="">Seçiniz</option>
-                          {[
-                            "A",
-                            "B",
-                            "C",
-                            "D",
-                            "E",
-                            "S (Sport)",
-                            "J (SUV)",
-                          ].map((s) => (
-                            <option key={s}>{s}</option>
-                          ))}
+                          <option>A</option>
+                          <option>B</option>
+                          <option>C</option>
+                          <option>D</option>
+                          <option>E</option>
+                          <option>S (Sport)</option>
+                          <option>J (SUV)</option>
                         </select>
                       </Field>
                       <Field label="Motor Kodu">
@@ -379,7 +394,7 @@ const Dashboard = ({ profile }) => {
                           onChange={(e) =>
                             set(
                               "price",
-                              e.target.value ? parseFloat(e.target.value) : "",
+                              e.target.value ? parseFloat(e.target.value) : ""
                             )
                           }
                         />
@@ -390,16 +405,16 @@ const Dashboard = ({ profile }) => {
                           value={formData.currency || "TRY"}
                           onChange={(e) => set("currency", e.target.value)}
                         >
-                          <option value="TRY">₺ Türk Lirası (TRY)</option>
-                          <option value="USD">$ Amerikan Doları (USD)</option>
-                          <option value="GBP">£ İngiliz Sterlini (GBP)</option>
+                          <option value="TRY">Türk Lirası (TRY)</option>
+                          <option value="USD">Amerikan Doları (USD)</option>
+                          <option value="GBP">İngiliz Sterlini (GBP)</option>
                         </select>
                       </Field>
                     </div>
                   </div>
                   <div>
                     <p className="text-red-600 text-[10px] font-black uppercase tracking-widest border-b border-zinc-800 pb-2 mb-4">
-                      3. Medya Galeri
+                      4. Medya Galeri
                     </p>
                     <Field label="Araç Fotoğrafları (Çoklu Seçim)">
                       <input
@@ -420,6 +435,7 @@ const Dashboard = ({ profile }) => {
                 </div>
               )}
 
+              {/* MOTOR FORMU */}
               {formType === "engine" && (
                 <div className="space-y-6">
                   <div>
@@ -500,7 +516,39 @@ const Dashboard = ({ profile }) => {
                   </div>
                   <div>
                     <p className="text-red-600 text-[10px] font-black uppercase tracking-widest border-b border-zinc-800 pb-2 mb-4">
-                      3. Medya Galeri
+                      3. Fiyat Bilgisi
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Field label="Fiyat">
+                        <input
+                          type="number"
+                          step="0.01"
+                          className={inputClass}
+                          value={formData.price}
+                          onChange={(e) =>
+                            set(
+                              "price",
+                              e.target.value ? parseFloat(e.target.value) : ""
+                            )
+                          }
+                        />
+                      </Field>
+                      <Field label="Para Birimi">
+                        <select
+                          className={selectClass}
+                          value={formData.currency || "TRY"}
+                          onChange={(e) => set("currency", e.target.value)}
+                        >
+                          <option value="TRY">Türk Lirası (TRY)</option>
+                          <option value="USD">Amerikan Doları (USD)</option>
+                          <option value="GBP">İngiliz Sterlini (GBP)</option>
+                        </select>
+                      </Field>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-red-600 text-[10px] font-black uppercase tracking-widest border-b border-zinc-800 pb-2 mb-4">
+                      4. Medya Galeri
                     </p>
                     <Field label="Motor Fotoğrafları (Çoklu Seçim)">
                       <input
@@ -521,6 +569,7 @@ const Dashboard = ({ profile }) => {
                 </div>
               )}
 
+              {/* PARÇA FORMU */}
               {formType === "part" && (
                 <div className="space-y-6">
                   <div>
@@ -564,7 +613,39 @@ const Dashboard = ({ profile }) => {
                   </div>
                   <div>
                     <p className="text-red-600 text-[10px] font-black uppercase tracking-widest border-b border-zinc-800 pb-2 mb-4">
-                      2. Medya Galeri
+                      2. Fiyat Bilgisi
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Field label="Fiyat">
+                        <input
+                          type="number"
+                          step="0.01"
+                          className={inputClass}
+                          value={formData.price}
+                          onChange={(e) =>
+                            set(
+                              "price",
+                              e.target.value ? parseFloat(e.target.value) : ""
+                            )
+                          }
+                        />
+                      </Field>
+                      <Field label="Para Birimi">
+                        <select
+                          className={selectClass}
+                          value={formData.currency || "TRY"}
+                          onChange={(e) => set("currency", e.target.value)}
+                        >
+                          <option value="TRY">Türk Lirası (TRY)</option>
+                          <option value="USD">Amerikan Doları (USD)</option>
+                          <option value="GBP">İngiliz Sterlini (GBP)</option>
+                        </select>
+                      </Field>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-red-600 text-[10px] font-black uppercase tracking-widest border-b border-zinc-800 pb-2 mb-4">
+                      3. Medya Galeri
                     </p>
                     <Field label="Parça Fotoğrafları (Çoklu Seçim)">
                       <input

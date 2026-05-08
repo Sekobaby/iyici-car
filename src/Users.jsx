@@ -115,6 +115,7 @@ const Users = () => {
 
   const handleVerifyUser = async (userId, email) => {
     try {
+      // Sadece profiles'i güncelle
       const { error } = await supabase
         .from("profiles")
         .update({ email_verified: true })
