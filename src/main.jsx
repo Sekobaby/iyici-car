@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import Login from "./Login.jsx";
 import { supabase } from "./supabaseClient.js";
+import { BrowserRouter as Router } from "react-router-dom";
 
 const Root = () => {
   const [session, setSession] = useState(null);
@@ -36,6 +37,10 @@ const Root = () => {
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Root />
+    <Router>
+      {" "}
+      {/* Uygulamanın en dışına bu gelmeli */}
+      <Root />
+    </Router>
   </StrictMode>,
 );
