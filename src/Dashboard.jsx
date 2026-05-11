@@ -150,7 +150,7 @@ const Dashboard = ({ profile }) => {
       label: "Parçalar",
       value: stats.parts,
       icon: Package,
-      color: "text-green-500",
+      color: "text-emerald-500",
       bg: "bg-green-500/10 border-green-500/20",
     },
   ];
