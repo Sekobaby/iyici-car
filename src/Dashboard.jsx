@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import { Car, Cog, Package } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const inputClass =
   "w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white outline-none focus:border-red-600 text-sm";
