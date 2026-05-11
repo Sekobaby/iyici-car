@@ -129,7 +129,7 @@ const Dashboard = ({ profile }) => {
 
   const formTitle =
     formType === "vehicle" ? "Araç" : formType === "engine" ? "Motor" : "Parça";
-
+  const navigate = useNavigate();
   const statCards = [
     {
       label: "Araçlar",
@@ -202,7 +202,8 @@ const Dashboard = ({ profile }) => {
           return (
             <div
               key={card.label}
-              className={`border rounded-3xl p-6 flex items-center gap-5 ${card.bg}`}
+              onClick={() => navigate(`/inventory?category=${card.categoryId}`)}
+              className={`border rounded-3xl p-6 flex items-center gap-5 cursor-pointer hover:scale-105 transition-transform ${card.bg}`}
             >
               <div
                 className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-black/20 ${card.color}`}
